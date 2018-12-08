@@ -123,12 +123,15 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
         self.labelList.itemDoubleClicked.connect(self.editLabel)
         # Connect to itemChanged to detect checkbox changes.
         self.labelList.itemChanged.connect(self.labelItemChanged)
+
+                
         self.labelList.setDragDropMode(
             QtWidgets.QAbstractItemView.InternalMove)
         self.labelList.setParent(self)
         self.shape_dock = QtWidgets.QDockWidget('Polygon Labels', self)
         self.shape_dock.setObjectName('Labels')
         self.shape_dock.setWidget(self.labelList)
+        
 
         self.uniqLabelList = EscapableQListWidget()
         self.uniqLabelList.setToolTip(
@@ -137,6 +140,8 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
         if self._config['labels']:
             self.uniqLabelList.addItems(self._config['labels'])
             self.uniqLabelList.sortItems()
+
+
         self.label_dock = QtWidgets.QDockWidget(u'Label List', self)
         self.label_dock.setObjectName(u'Label List')
         self.label_dock.setWidget(self.uniqLabelList)
@@ -884,15 +889,43 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
     def loadLabels(self, shapes):
         s = []
         for label, points, line_color, fill_color, shape_type in shapes:
-            shape = Shape(label=label, shape_type=shape_type)
-            for x, y in points:
-                shape.addPoint(QtCore.QPoint(x, y))
-            shape.close()
-            s.append(shape)
-            if line_color:
-                shape.line_color = QtGui.QColor(*line_color)
-            if fill_color:
-                shape.fill_color = QtGui.QColor(*fill_color)
+            
+            #####################################
+            # just show the polygon which class is in label.txt
+            if self._config['labels']:
+                if label in self._config['labels']:
+                    shape = Shape(label=label, shape_type=shape_type)
+                    for x, y in points:
+                        shape.addPoint(QtCore.QPoint(x, y))
+                    shape.close()
+                    s.append(shape)
+                    if line_color:
+                        shape.line_color = QtGui.QColor(*line_color)
+                    if fill_color:
+                        shape.fill_color = QtGui.QColor(*fill_color)
+                        
+                    # define the linecolors by file 
+                    if self._config['lcolors']:
+                        index = self._config['labels'].index(label)
+                        line_color = self._config['lcolors'][index]
+                        if line_color == 'null':
+                            continue
+                        line_color = line_color.split(',')
+                        line_color = [int(i) for i in line_color]
+                        shape.line_color = QtGui.QColor(*line_color)
+                        
+            else:
+                    
+            ####################################
+                shape = Shape(label=label, shape_type=shape_type)
+                for x, y in points:
+                    shape.addPoint(QtCore.QPoint(x, y))
+                shape.close()
+                s.append(shape)
+                if line_color:
+                    shape.line_color = QtGui.QColor(*line_color)
+                if fill_color:
+                    shape.fill_color = QtGui.QColor(*fill_color)
         self.loadShapes(s)
 
     def loadFlags(self, flags):
@@ -967,13 +1000,16 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
             shape = self.labelList.get_shape_from_item(item)
             self.canvas.selectShape(shape)
 
+
+
     def labelItemChanged(self, item):
         shape = self.labelList.get_shape_from_item(item)
         label = str(item.text())
         if label != shape.label:
             shape.label = str(item.text())
             self.setDirty()
-        else:  # User probably changed item visibility
+        else:
+            # User probably changed item visibility
             self.canvas.setShapeVisible(shape, item.checkState() == Qt.Checked)
 
     # Callback functions:
@@ -998,6 +1034,21 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
             self.canvas.shapesBackups.pop()
         else:
             self.addLabel(self.canvas.setLastLabel(text))
+            ################################################
+            
+            # modify the color according to the lcolors
+            if self._config['labels']:
+                if text in self._config['labels']:
+                    if self._config['lcolors']:
+                        index = self._config['labels'].index(text)
+                        line_color = self._config['lcolors'][index]
+                        if line_color != 'null':
+                            line_color = line_color.split(',')
+                            line_color = [int(i) for i in line_color]
+                            self.canvas.current.line_color = QtGui.QColor(*line_color)
+                        
+                    
+            ################################################
             self.actions.editMode.setEnabled(True)
             self.actions.undoLastPoint.setEnabled(False)
             self.actions.undo.setEnabled(True)
@@ -1432,16 +1483,16 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
             self.setDirty()
 
     def deleteSelectedShape(self):
-        yes, no = QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No
-        msg = 'You are about to permanently delete this polygon, ' \
-              'proceed anyway?'
-        if yes == QtWidgets.QMessageBox.warning(self, 'Attention', msg,
-                                                yes | no):
-            self.remLabel(self.canvas.deleteSelected())
-            self.setDirty()
-            if self.noShapes():
-                for action in self.actions.onShapesPresent:
-                    action.setEnabled(False)
+        #yes, no = QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No
+        #msg = 'You are about to permanently delete this polygon, ' \
+        #      'proceed anyway?'
+        #if yes == QtWidgets.QMessageBox.warning(self, 'Attention', msg,
+        #                                        yes | no):
+        self.remLabel(self.canvas.deleteSelected())
+        self.setDirty()
+        if self.noShapes():
+            for action in self.actions.onShapesPresent:
+                action.setEnabled(False)
 
     def chshapeLineColor(self):
         color = self.colorDialog.getColor(
