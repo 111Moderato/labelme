@@ -142,6 +142,16 @@ labelme data_annotated/  # Open directory to annotate all images in it
 labelme data_annotated/ --labels labels.txt  # specify label list with a file
 ```
 
+
+
+预先指定label和label对应的线条颜色:
+```
+labelme --nodata --labels labels.txt --validatelabel exact --autosave --lcolors lcolors.txt
+```
+
+
+
+
 For more advanced usage, please refer to the examples:
 
 * [Tutorial (Single Image Example)](https://github.com/wkentaro/labelme/blob/master/examples/tutorial)
