@@ -5,6 +5,7 @@ from qtpy import QtWidgets
 from labelme import QT5
 from labelme.shape import Shape
 import labelme.utils
+from labelme.config import get_config
 
 
 # TODO(unknown):
@@ -51,6 +52,8 @@ class Canvas(QtWidgets.QWidget):
         #   - createMode == 'rectangle': diagonal line of the rectangle
         #   - createMode == 'line': the line
         #   - createMode == 'point': the point
+        
+        
         self.line = Shape(line_color=self.lineColor)
         self.prevPoint = QtCore.QPoint()
         self.prevMovePoint = QtCore.QPoint()
@@ -213,11 +216,11 @@ class Canvas(QtWidgets.QWidget):
                 self.boundedMoveVertex(pos)
                 self.repaint()
                 self.movingShape = True
-            elif self.selectedShape and self.prevPoint:
-                self.overrideCursor(CURSOR_MOVE)
-                self.boundedMoveShape(self.selectedShape, pos)
-                self.repaint()
-                self.movingShape = True
+            #elif self.selectedShape and self.prevPoint:
+                #self.overrideCursor(CURSOR_MOVE)
+                #self.boundedMoveShape(self.selectedShape, pos)
+                #self.repaint()
+                #self.movingShape = True
             return
 
         # Just hovering over the canvas, 2 posibilities:
@@ -530,9 +533,12 @@ class Canvas(QtWidgets.QWidget):
         self.current.close()
         self.shapes.append(self.current)
         self.storeShapes()
-        self.current = None
+        #self.current = None
         self.setHiding(False)
         self.newShape.emit()
+#############################        
+        self.current = None
+#############################
         self.update()
 
     def closeEnough(self, p1, p2):
