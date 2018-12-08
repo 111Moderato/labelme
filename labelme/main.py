@@ -68,6 +68,13 @@ def main():
         help='comma separated list of labels OR file containing labels',
         default=argparse.SUPPRESS,
     )
+##########################################
+    parser.add_argument(
+        '--lcolors',
+        help='comma separated list of linecolors OR file containing linecolors',
+        default=argparse.SUPPRESS,
+    )
+##########################################
     parser.add_argument(
         '--validatelabel',
         dest='validate_label',
@@ -106,7 +113,15 @@ def main():
                 args.labels = [l.strip() for l in f if l.strip()]
         else:
             args.labels = [l for l in args.labels.split(',') if l]
-
+##########################################
+    if hasattr(args, 'lcolors'):
+        if os.path.isfile(args.lcolors):
+            with codecs.open(args.lcolors, 'r', encoding='utf-8') as f:
+                args.lcolors = [l.strip() for l in f if l.strip()]
+        else:
+            logger.error('--lcolors must be a file!')
+            sys.exit(1)
+##########################################
     config_from_args = args.__dict__
     config_from_args.pop('version')
     reset_config = config_from_args.pop('reset_config')
