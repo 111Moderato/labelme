@@ -28,6 +28,10 @@ class Canvas(QtWidgets.QWidget):
     shapeMoved = QtCore.Signal()
     drawingPolygon = QtCore.Signal(bool)
     edgeSelected = QtCore.Signal(bool)
+##############
+    couldmove=QtCore.Signal()
+##############
+
 
     CREATE, EDIT = 0, 1
 
@@ -69,6 +73,10 @@ class Canvas(QtWidgets.QWidget):
         self.movingShape = False
         self._painter = QtGui.QPainter()
         self._cursor = CURSOR_DEFAULT
+#################
+        self.flag=0
+#################
+
         # Menus:
         self.menus = (QtWidgets.QMenu(), QtWidgets.QMenu())
         # Set widget options.
@@ -212,15 +220,18 @@ class Canvas(QtWidgets.QWidget):
         # Polygon/Vertex moving.
         self.movingShape = False
         if QtCore.Qt.LeftButton & ev.buttons():
+            self.couldmove.emit()
             if self.selectedVertex():
                 self.boundedMoveVertex(pos)
                 self.repaint()
                 self.movingShape = True
-            #elif self.selectedShape and self.prevPoint:
-                #self.overrideCursor(CURSOR_MOVE)
-                #self.boundedMoveShape(self.selectedShape, pos)
-                #self.repaint()
-                #self.movingShape = True
+            elif self.flag == 1:
+                if self.selectedShape and self.prevPoint:
+                    self.overrideCursor(CURSOR_MOVE)
+                    self.boundedMoveShape(self.selectedShape, pos)
+                    self.repaint()
+                    self.movingShape = True
+                    self.flag = 0
             return
 
         # Just hovering over the canvas, 2 posibilities:
