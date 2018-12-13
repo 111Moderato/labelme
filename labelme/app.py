@@ -172,6 +172,9 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
         )
         self.canvas.zoomRequest.connect(self.zoomRequest)
 
+##################
+        self.canvas.couldmove.connect(self.control_Move)
+##################
         scrollArea = QtWidgets.QScrollArea()
         scrollArea.setWidget(self.canvas)
         scrollArea.setWidgetResizable(True)
@@ -252,6 +255,18 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
             enabled=True,
         )
         saveAuto.setChecked(self._config['auto_save'])
+
+
+###############################
+        couldMove = action(
+            text='couldMove',
+            slot=lambda x: self.actions.couldMove.setChecked(x),
+            icon='color-line',
+            tip='couldMove',
+            checkable=True,
+            enabled=True,
+        )
+###############################
 
         close = action('&Close', self.closeFile, shortcuts['close'], 'close',
                        'Close current file')
@@ -411,7 +426,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
 
         # Store actions for further handling.
         self.actions = struct(
-            saveAuto=saveAuto,
+            saveAuto=saveAuto,couldMove=couldMove,
             changeOutputDir=changeOutputDir,
             save=save, saveAs=saveAs, open=open_, close=close,
             lineColor=color1, fillColor=color2,
@@ -450,6 +465,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
                 undo,
                 undoLastPoint,
                 addPoint,
+                couldMove,
             ),
             onLoadActive=(
                 close,
@@ -466,6 +482,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
 
         self.canvas.edgeSelected.connect(self.actions.addPoint.setEnabled)
 
+
         self.menus = struct(
             file=self.menu('&File'),
             edit=self.menu('&Edit'),
@@ -477,7 +494,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
 
         addActions(self.menus.file, (open_, openNextImg, openPrevImg, opendir,
                                      self.menus.recentFiles,
-                                     save, saveAs, saveAuto, changeOutputDir,
+                                     save, saveAs, saveAuto,couldMove, changeOutputDir,
                                      close,
                                      None,
                                      quit))
@@ -601,6 +618,12 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
         #    QWhatsThis.enterWhatsThisMode()
 
     # Support Functions
+
+###############################
+    def control_Move(self):
+        if self.actions.couldMove.isChecked():
+            self.canvas.flag=1
+###############################
 
     def noShapes(self):
         return not self.labelList.itemsToShapes
