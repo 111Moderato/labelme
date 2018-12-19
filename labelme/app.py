@@ -975,8 +975,10 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
             previous_shape=LabelFile(filename)
             if previous_shape:
                 for label_, points_, line_color_, fill_color_, shape_type_ in previous_shape.shapes:
-                    sh = dict(label=str(label_),line_color=line_color_,fill_color=fill_color_,points=[[int(p[0]),int(p[1])] for p in points_],shape_type= shape_type_)
-                    shapes.append(sh)
+                    if self._config['labels']:
+                        if label_ not in self._config['labels']:
+                            sh = dict(label=str(label_),line_color=line_color_,fill_color=fill_color_,points=[[int(p[0]),int(p[1])] for p in points_],shape_type= shape_type_)
+                            shapes.append(sh)
 #############################################
         flags = {}
         for i in range(self.flag_widget.count()):
