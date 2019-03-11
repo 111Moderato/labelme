@@ -1152,8 +1152,10 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
             self.fileListWidget.setCurrentRow(self.imageList.index(filename))
             self.fileListWidget.repaint()
             return
-
+####################################
+        self.canvas.setUpdatesEnabled(False)
         self.resetState()
+###################################
         self.canvas.setEnabled(False)
         if filename is None:
             filename = self.settings.value('filename', '')
@@ -1234,6 +1236,9 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
             if self.labelFile.flags is not None:
                 self.loadFlags(self.labelFile.flags)
         self.setClean()
+###################################
+        self.canvas.setUpdatesEnabled(True)
+###################################
         self.canvas.setEnabled(True)
         self.adjustScale(initial=True)
         self.paintCanvas()
