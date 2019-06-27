@@ -26,12 +26,12 @@ del here
 
 
 install_requires = [
-    'lxml',
-    'matplotlib',
-    'numpy',
-    'Pillow>=2.8.0',
-    'PyYAML',
-    'qtpy',
+    'lxml==4.3.4',
+    'matplotlib==2.2.2',
+    'numpy==1.16.4',
+    'Pillow==6.0.0',
+    'PyYAML==5.1.1',
+    'qtpy==1.8.0',
 ]
 
 # Find python binding for qt with priority:
