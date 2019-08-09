@@ -34,6 +34,8 @@ from labelme.widgets import LabelDialog
 from labelme.widgets import LabelQListWidget
 from labelme.widgets import ToolBar
 from labelme.widgets import ZoomWidget
+import sys
+PY2 = sys.version_info[0] == 2
 
 
 # FIXME
@@ -961,7 +963,7 @@ class MainWindow(QtWidgets.QMainWindow, WindowMixin):
         lf = LabelFile()
 
         def format_shape(s):
-            return dict(label=str(s.label),
+            return dict(label=s.label.encode('utf-8') if PY2 else s.label,
                         line_color=s.line_color.getRgb()
                         if s.line_color != self.lineColor else None,
                         fill_color=s.fill_color.getRgb()
