@@ -35,9 +35,13 @@ from labelme.widgets import LabelQListWidget
 from labelme.widgets import ToolBar
 from labelme.widgets import ZoomWidget
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 PY2 = sys.version_info[0] == 2
+if PY2:
+    reload(sys)
+    sys.setdefaultencoding('utf8')
+else:
+    import importlib
+    importlib.reload(sys)
 
 
 # FIXME
