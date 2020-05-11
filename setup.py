@@ -85,7 +85,7 @@ setup(
     version=version,
     packages=find_packages(),
     description='Image Polygonal Annotation with Python.',
-    long_description=open('README.md').read(),
+    long_description=open('README.md','r', encoding='UTF-8').read(),
     long_description_content_type='text/markdown',
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
